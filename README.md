@@ -1,2 +1,4 @@
-# ECE175Final
-# ECE175Final
+# ECE 175 Final Project
+## Ryan Fong, Lilly Gentry
+
+
