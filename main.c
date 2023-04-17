@@ -5,6 +5,7 @@
 #include "cardNode.h"
 #define DECK_FILE_PATH "./cardDeck.dat"
 
+
 int main(){
     card *deckHead = NULL, *playerHand = NULL, *player2Hand = NULL, *shuffleHead = NULL;
     deckHead = (card*)malloc(sizeof(card));
@@ -21,14 +22,11 @@ int main(){
     printf("\n");
     card *currentNode = (deckHead->nextCard);
     card* testFind = getFromIndex(deckHead, 51);
-    shuffleHand(deckHead, shuffleHead);
-    shuffleHand(shuffleHead, deckHead);
-    shuffleHand(deckHead, shuffleHead);
-    shuffleHand(shuffleHead, deckHead);
-    shuffleHand(deckHead, shuffleHead);
-    shuffleHand(shuffleHead, deckHead);
-    shuffleHand(deckHead, shuffleHead);
-    shuffleHand(shuffleHead, deckHead);
+    for(int i = 0; i < 50; i++){
+        shuffleHand(deckHead, shuffleHead);
+        shuffleHand(shuffleHead, deckHead);
+
+    }
 
     listHand(deckHead);
     int temp = countHand(deckHead);

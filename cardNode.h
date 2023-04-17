@@ -1,3 +1,5 @@
+#ifndef _CardNode
+#define _CardNode
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -143,3 +145,4 @@ void shuffleHand(card* headNode, card*shuffleHead){
         free(shuffleTemp);
 }
 
+#endif // _CardNode
