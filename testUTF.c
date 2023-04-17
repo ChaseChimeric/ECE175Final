@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include "cardNode.h"
-#define DECK_FILE_PATH "./cardDeck.dat"
+#include <wchar.h>
+#include <locale.h>
+#include "cardNodeUTF.h"
+#define DECK_FILE_PATH "./cardDeckUTF.dat"
 
 
 int main(){
+    setlocale(LC_ALL, "");
+    wchar_t heart = 0x1F0A9;
     card *deckHead = NULL, *playerHand = NULL, *player2Hand = NULL, *shuffleHead = NULL;
     deckHead = (card*)malloc(sizeof(card));
     newCardNode(deckHead, NULL, -1, 'C', 'R'); 
@@ -17,22 +21,18 @@ int main(){
     newCardNode(deckHead, NULL, -1, '#', '#'); 
     newCardNode(playerHand, NULL, -2, '#', '#');
     newCardNode(player2Hand, NULL, -3, '#', '#');
-    
-    //listHand(deckHead);
-    //printf("\n");
-    card *currentNode = (deckHead->nextCard);
-    card* testFind = getFromIndex(deckHead, 51);
-    for(int i = 0; i < 240000; i++){
+
+    // Shuffle deck
+    for(int i = 0; i < 100; i++){
         shuffleHand(deckHead, shuffleHead);
         shuffleHand(shuffleHead, deckHead);
 
     }
+    for(int i = 0; i < 7; i++)
+        pullFrom(deckHead, playerHand);
+    //listHand(deckHead);
 
-    listHand(deckHead);
-    int temp = countHand(deckHead);
 
-
-    // test print deck
 
     return 0;
 }
