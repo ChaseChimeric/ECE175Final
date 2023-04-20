@@ -4,6 +4,7 @@
 #include <math.h>
 #include <wchar.h>
 #include <locale.h>
+#include <string.h>
 #include "cardNodeDos.h"
 #include "Graphics.h"
 #include "Game.h"
@@ -30,12 +31,12 @@ int main(){
     initDeck(deckHead, DECK_FILE_PATH);
 
     
-    int playerAmount = 0, targetCard;
+    int playerAmount = 0, targetCard, currentCard;
     char playCards[200], tmpStr[50];
 
     // Shuffle deck
     ClearScreen();
-    G_intro();
+    //G_intro();
     ClearScreen();
 
 
@@ -84,8 +85,14 @@ int main(){
     while(targetCard < 1 || targetCard > countHand(playDeck)){
         printf("Select cards to play separated by comma (1-%d): ", countHand(players[0]));
         fgets(playCards, 200, stdin);
-        
-
+        int count = 0;
+        playCards[strlen(playCards)-1] = '\0';
+        while(strrchr(playCards, ',') != NULL){
+            for(int i = 0; i < strlen(playCards); i++)
+                count++;
+            atoi(strrchr(playCards, ',')+1);
+            currentCard++;
+        }
     }
     
     //printf("%s", cardGfx[0]);
