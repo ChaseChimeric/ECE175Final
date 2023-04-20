@@ -1,0 +1,22 @@
+deal 7 cards to each payer
+
+game loop:
+    next player
+    show center
+    show hand
+    select cards to play on center row 1
+    check if cards can be played
+    yes? play cards
+    select cards to play on center row 2
+    check if cards can be played
+    yes? play cards
+    ...
+
+    is player hand empty?
+        yes:
+            end round
+            add points 
+            check win 200 points
+        no:
+            continue
+            
