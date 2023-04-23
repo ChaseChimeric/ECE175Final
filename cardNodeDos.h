@@ -8,6 +8,7 @@
 typedef struct _cardNode {
     // Data
     int value;
+    int stacked;
     char action;
     char color;
 
@@ -25,6 +26,9 @@ void listHandText(card* headNode);
 void removeFrom(card *headNode, card *toRemove);
 void shuffleHand(card* headNode, card*shuffleHead);
 void pullFrom(card *from, card *destination, int amount);
+void moveIndTo(card*, card*, int, int);
+
+
 
 
 
@@ -36,6 +40,7 @@ void newCardNode(card *thisobj, card *next, int value, char action, char color){
     thisobj->action = action;
     thisobj->color = color;
     thisobj->nextCard = next;
+    thisobj->stacked = 0;
 }
 
 void insertAfter(card* first, card* second){
@@ -95,6 +100,7 @@ void initDeck(card *head, char filepath[]){
         fscanf(inFile, "%d%*c", &tmpDat2);
         tmp->value = tmpDat2;
         insertAfter(head, tmp);
+        tmp->stacked = 0;
     }
     // Extra copy of last card is added because of feof() behavior, this fixed that
     //card *tempdel = head->nextCard;
@@ -209,18 +215,24 @@ void shuffleHand(card* headNode, card*shuffleHead){
     currentNode = headNode->nextCard;
     while(inHand != 1){
         randSelect = (rand()%(inHand-1))+1; // get random index
+        //moveIndTo(shuffleHead, headNode, randSelect-1);
+
         removeCopy = (card*)malloc(sizeof(card)); // initialize new memory for card
         shuffleTemp = (card*)(getFromIndex(headNode, randSelect)); //set shuffleTemp == to old memory
         newCardNode(removeCopy, NULL, shuffleTemp->value, shuffleTemp->action, shuffleTemp->color); //make new copy of data
         insertAfter(shuffleHead, removeCopy); // insert new data copy to other head
+        removeCopy->stacked = 0;
         removeFrom(headNode, shuffleTemp); // remove old memory from original head
         free(shuffleTemp); // free old memory
+        
+
         inHand = countHand(headNode); // recount deck
     }
     removeCopy = (card*)malloc(sizeof(card)); // initialize new memory for card
     shuffleTemp = headNode->nextCard; //set shuffleTemp == to old memory
     newCardNode(removeCopy, NULL, shuffleTemp->value, shuffleTemp->action, shuffleTemp->color); //make new copy of data
     insertAfter(shuffleHead, removeCopy); // insert new data copy to other head
+    removeCopy->stacked = 0;
     removeFrom(headNode, shuffleTemp); // remove old memory from original head
     free(shuffleTemp);
 }
@@ -240,5 +252,20 @@ void pullFrom(card *from, card *destination, int amount){
         free(toPull);
     }
 }
+
+void moveIndTo(card* fromHead, card* toHead, int index, int stack){
+    //make all references -1
+    card *toPull = getFromIndex(fromHead, index), *tempCpy = NULL;
+        tempCpy = (card*)malloc(sizeof(card));
+        newCardNode(tempCpy, NULL, toPull->value, toPull->action, toPull->color);
+        insertAfter(toHead, tempCpy);
+        removeFrom(fromHead, toPull);
+        tempCpy->stacked = stack;
+        free(toPull);
+
+
+
+}
+
 
 #endif // _CardNode
