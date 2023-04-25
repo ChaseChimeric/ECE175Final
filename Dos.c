@@ -18,6 +18,7 @@ int main(){
     setlocale(LC_ALL, "");
     card *deckHead = NULL, *shuffleHead = NULL, *playDeck = NULL;
     card* players[6];
+    int playerScore[6];
     wchar_t cardGfx[11][41];
     loadGfx(cardGfx);
     deckHead = (card*)malloc(sizeof(card));
@@ -29,7 +30,7 @@ int main(){
     initDeck(deckHead, DECK_FILE_PATH);
 
     
-    int playerAmount = 0, targetCard, amountToPlay = -111, cardsToPlay[2], cont = 0, gameloop = 1;
+    int playerAmount = 0, targetCard, amountToPlay = -111, cardsToPlay[2], cont = 0, gameloop = 1, hasPlayed = 0, currentPlayer = 0;;
     char playCards[200], tmpStr[50];
 
     // Shuffle deck
@@ -67,18 +68,22 @@ int main(){
         default:
             break;
     }
-    
-    pullFrom(deckHead, players[0], 7);
+    for(int i = 0; i < playerAmount; i++){
+        pullFrom(deckHead, players[i], 7);
+    }
     pullFrom(deckHead, playDeck, 2);
     while(gameloop){
+        if(currentPlayer > (playerAmount-1))
+            currentPlayer = 0;
+        
         ClearScreen();
         printf("Current Center Row\n");
         showHand(playDeck, cardGfx);
-        printf("Your Hand\n");
-        showHand(players[0], cardGfx);
+        printf("Your Hand, player %d\n", currentPlayer);
+        showHand(players[currentPlayer], cardGfx);
         targetCard = -1;
 
-        while(targetCard < 0 || targetCard > countHand(playDeck)){
+        while((targetCard < 0 || targetCard > countHand(playDeck))){
             printf("Select Center Row Card to play on (1-%d, 0 if not playing): ", countHand(playDeck));
             scanf("%d", &targetCard);
         }
@@ -90,39 +95,94 @@ int main(){
             scanf("%d", &amountToPlay);
         }
         while(!cont && (amountToPlay != 0)){
-            while((cardsToPlay[0] < 1) || (cardsToPlay[0] > countHand(players[0]))){
-                printf("Select Card 1 to play (1-%d): ", countHand(players[0]));
+            while((cardsToPlay[0] < 1) || (cardsToPlay[0] > countHand(players[currentPlayer]))){
+                printf("Select Card 1 to play (1-%d): ", countHand(players[currentPlayer]));
                 scanf("%d", &cardsToPlay[0]);
                 cont = 1;
             }
 
             if(amountToPlay == 2){
-            while((cardsToPlay[1] < 1) || cardsToPlay[1] > countHand(players[0])){
-                printf("Select Card 2 to play (1-%d): ", countHand(players[0]));
+            while((cardsToPlay[1] < 1) || cardsToPlay[1] > countHand(players[currentPlayer])){
+                printf("Select Card 2 to play (1-%d): ", countHand(players[currentPlayer]));
                 scanf("%d",&cardsToPlay[1]);
             }
             }
         }
-        while(amountToPlay == 0 && cardsToPlay[0] < 1 || cardsToPlay[0] > countHand(players[0])){
+        while((amountToPlay == 0) && (cardsToPlay[0] < 1 || cardsToPlay[0] > countHand(players[currentPlayer])) && (hasPlayed == 0)){
             printf("Your New Hand:\n");
-            pullFrom(deckHead, players[0], 1);
-            showHand(players[0], cardGfx);
-            printf("Select card to discard to center row (1-%d): ", countHand(players[0]));
+            pullFrom(deckHead, players[currentPlayer], 1);
+            showHand(players[currentPlayer], cardGfx);
+            printf("Select card to discard to center row (1-%d): ", countHand(players[currentPlayer]));
             scanf("%d", &cardsToPlay[0]);
         }
-        ExecuteAction(players[0],playDeck, shuffleHead, targetCard, amountToPlay, cardsToPlay);
-        for(int i = 0; i < 1; i++)
-            delay(5,0);
-        playerAmount = 0;
+        if((amountToPlay == 0)&&(hasPlayed==1)){
+            amountToPlay = -9;
+            cardsToPlay[0] = -1;
+            cardsToPlay[1] = -1;
+        }
+        int actionState = ExecuteAction(players[currentPlayer],playDeck, shuffleHead, targetCard, amountToPlay, cardsToPlay, cardGfx);
+        if(actionState != 0)
+            hasPlayed = 1;
+
+
+        //playerAmount = 0;
+
+        switch(actionState){
+            case 1:
+                printf("single match\n");
+                break;
+            case 2:
+                printf("single color match\n");
+                break;
+            case 3:
+                printf("double match\n");
+                break;
+            case 4:
+                printf("double color match\n");
+                break;
+            case 0:
+                if(getFromIndex(playDeck, targetCard-1)->stacked == 1){
+                    printf("Cannot play on an already stacked card.\n");
+                }
+                else{
+                    printf("Not a valid match\n");
+                }
+                break;
+            case -1:
+                printf("shouldn't have gotten to this point, errorororrrrrrrrrr\n");
+                break;
+            case -2:
+                printf("Card Discarded\nEnding Turn\n");
+                resetPlayDeck(playDeck, deckHead);
+                currentPlayer++;
+                //increment player
+                
+                break;
+            case -3:
+                printf("Cannot play on an already stacked card.\n");
+                
+                break;
+            case -4:
+                //increment player
+                printf("Ending turn.\n");
+                resetPlayDeck(playDeck, deckHead);
+                currentPlayer++;
+                break;
+            default:
+                break;
+        }
         amountToPlay = -111;
         cont = 0;
         cardsToPlay[0] = -1;
         cardsToPlay[1] = -1;
+    
+            for(int i = 0; i < 1; i++)
+            delay(2,0);
     }
 
-    showHand(playDeck, cardGfx);
-    printf("\n\n");
-    showHand(players[0], cardGfx);
+    //showHand(playDeck, cardGfx);
+    //printf("\n\n");
+    //showHand(players[currentPlayer], cardGfx);
     //reset all vars
     //end turn
     fflush(stdout);
