@@ -9,28 +9,36 @@
 #include "cardNodeDos.h"
 
 void showHand(card*, wchar_t[11][41]);
-int ExecuteAction(card*, card*, card*, int, int, int[2]);
+int ExecuteAction(card*, card*, card*, int, int, int[2], wchar_t[11][41]);
+void resetPlayDeck(card *playDeck, card *deckHead);
 
 void showHand(card* headNode, wchar_t gfx[11][41]){
     card* currentNode = headNode->nextCard;
+    int iter = 1;
     while (currentNode != NULL)
-    {
-        switch (currentNode->color)
-        {
-        case 'R':
-            printf("\033[31m");
-            break;
-        case 'B':
-            printf("\033[32m");
-            break;
-        case 'Y':
-            printf("\033[33m");
-            break;
-        case 'G':
-            printf("\033[34m");
-            break;        
-        default:
-            break;
+    {       printf("\e[1;97m");
+            printf("%d\n", iter);
+        if(currentNode->stacked == 0){
+            switch (currentNode->color)
+            {
+            case 'R':
+                printf("\033[31m");
+                break;
+            case 'B':
+                printf("\033[32m");
+                break;
+            case 'Y':
+                printf("\033[33m");
+                break;
+            case 'G':
+                printf("\033[34m");
+                break;        
+            default:
+                break;
+            }
+        }
+        else{
+            printf("\e[0;35m");
         }
         switch(currentNode->value){
             case 1:
@@ -84,7 +92,7 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
                 printf("%lc", gfx[0][i]);
             }
         }
-        if(currentNode->value == 2){
+        if(currentNode->value == 2 && currentNode->stacked != 1){
             for(int i = 0; i < 40; i++){
                 if(i < 3){
                     printf("\033[31m");}
@@ -100,9 +108,16 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
 
             }
         }
+        else if(currentNode->value == 2 && currentNode->stacked == 1){
+            printf("\e[0;35m");
+            for(int i = 0; i < 40; i++){
+                printf("%lc", gfx[2][i]);
+            }
+        }
         printf("\033[0m");
         fflush(stdout);
     currentNode = currentNode->nextCard;
+    iter++;
     }
     
     
@@ -110,9 +125,12 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
 }
 
 
-int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIndex, int amountToPlay, int cardsToPlay[2]){
-    // make case for if target is # or wild 2
-    int stackVal1 = -1, stackVal2 = -1, swapTmp;
+int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIndex, int amountToPlay, int cardsToPlay[2], wchar_t gfx[11][41]){
+    
+    int largerIndex = -1, smallerIndex = -1, swapTmp, input;
+    if(amountToPlay == -9){
+        return -4;
+    }
     if(amountToPlay == 2){
         if(cardsToPlay[0] > cardsToPlay[1]){
             swapTmp = cardsToPlay[0];
@@ -125,31 +143,32 @@ int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIn
     }
     if(amountToPlay == 0){
         moveIndTo(player, centerRow, cardsToPlay[0]-1, 0);
-        printf("Card Discarded\n");
+        
+        return -2;
     }
     else if(amountToPlay == 1){
-        if(getFromIndex(player,cardsToPlay[0]-1)->value == getFromIndex(centerRow, targetIndex-1)->value || getFromIndex(player,cardsToPlay[0]-1)->value == 0 || getFromIndex(centerRow, targetIndex-1)->value == 0){
-            if(getFromIndex(player,cardsToPlay[0]-1)->color == getFromIndex(centerRow, targetIndex-1)->color || getFromIndex(player,cardsToPlay[0]-1)->color == 'W' || getFromIndex(centerRow, targetIndex-1)->color == 'W'){
+        if((getFromIndex(player,cardsToPlay[0]-1)->value == getFromIndex(centerRow, targetIndex-1)->value || getFromIndex(player,cardsToPlay[0]-1)->value == 0 || getFromIndex(centerRow, targetIndex-1)->value == 0)&& getFromIndex(centerRow, targetIndex-1)->stacked != 1){
+            if((getFromIndex(player,cardsToPlay[0]-1)->color == getFromIndex(centerRow, targetIndex-1)->color) || (getFromIndex(player,cardsToPlay[0]-1)->color == 'W') || (getFromIndex(centerRow, targetIndex-1)->color == 'W')){
                 //single color match
-                printf("single color match\n");
+                
                 moveIndTo(centerRow, shuffleHead, targetIndex-1, 1);
                 moveIndTo(player, centerRow, cardsToPlay[0]-1, 1);
                 //insertAfter()
-                
+                return 2;
                 
             }
             else{
-                printf("single match\n");
+                
                 moveIndTo(centerRow, shuffleHead, targetIndex-1, 1);
                 moveIndTo(player, centerRow, cardsToPlay[0]-1, 1);
-                
+                return 1;
             }
             //single match
             
         }
         else{
             // no match
-                printf("Not a valid match\n");
+                
                 return 0;
         }
     
@@ -163,39 +182,49 @@ int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIn
         
 
         
-        if(cardSum == getFromIndex(centerRow, targetIndex-1)->value || cardSum == 0){
-            if((getFromIndex(player,cardsToPlay[0]-1)->color == getFromIndex(centerRow, targetIndex-1)->color || getFromIndex(player,cardsToPlay[0]-1)->color == 'W' || getFromIndex(centerRow, targetIndex-1)->color == 'W') && (getFromIndex(player,cardsToPlay[1]-1)->color == getFromIndex(centerRow, targetIndex-1)->color || getFromIndex(player,cardsToPlay[1]-1)->color == 'W' || getFromIndex(centerRow, targetIndex-1)->color == 'W')){
-                // double color match
-                while(stackVal1 != 1 && stackVal1 != 2){
-                    printf("Which card should be on top? (1-2): ");
-                    scanf("%d", &stackVal1);
-                }
-                stackVal2 = (stackVal1 == 1)? 2:1;
-                moveIndTo(centerRow, shuffleHead, targetIndex-1, 1);
-                moveIndTo(player, shuffleHead, cardsToPlay[stackVal2-1]-1, 1);
-                moveIndTo(player, centerRow, cardsToPlay[stackVal1-1]-1, 1);
-                printf("double color match\n");
-                
+        if((cardSum == getFromIndex(centerRow, targetIndex-1)->value || cardSum == 0 )&& getFromIndex(centerRow, targetIndex-1)->stacked != 1){
+            //print action
+            //card *tmpHead = (card*)malloc(sizeof(card)), *move1 = (card*)malloc(sizeof(card)), *move2 = (card*)malloc(sizeof(card));
+
+            
+            if(cardsToPlay[0] < cardsToPlay[1]){
+                smallerIndex = 0;
+                largerIndex = 1;
             }
             else{
-                while(stackVal1 != 1 && stackVal1 != 2){
-                    printf("Which card should be on top? (1-2): ");
-                    scanf("%d", &stackVal1);
-                }
-                stackVal2 = (stackVal1 == 1)? 2:1;
+                smallerIndex = 1;
+                largerIndex = 0;
+            }
+            if(((getFromIndex(player,cardsToPlay[0]-1)->color == getFromIndex(centerRow, targetIndex-1)->color) || (getFromIndex(player,cardsToPlay[0]-1)->color == 'W') || (getFromIndex(centerRow, targetIndex-1)->color == 'W')) && ((getFromIndex(player,cardsToPlay[1]-1)->color == getFromIndex(centerRow, targetIndex-1)->color) || (getFromIndex(player,cardsToPlay[1]-1)->color == 'W') || (getFromIndex(centerRow, targetIndex-1)->color == 'W'))){
+                // double color match
+                
+                //stackVal2 = (stackVal1 == 1)? 2:1;
                 moveIndTo(centerRow, shuffleHead, targetIndex-1, 1);
-                moveIndTo(player, shuffleHead, cardsToPlay[stackVal2-1]-1, 1);
-                moveIndTo(player, centerRow, cardsToPlay[stackVal1-1]-1, 1);
+                moveIndTo(player, shuffleHead, cardsToPlay[largerIndex]-1, 1);
+                moveIndTo(player, centerRow, cardsToPlay[smallerIndex]-1, 1);
+
+                
+                return 4;
+            }
+            else{
+                
+                //stackVal2 = (stackVal1 == 1)? 2:1;
+                moveIndTo(centerRow, shuffleHead, targetIndex-1, 1);
+                moveIndTo(player, shuffleHead, cardsToPlay[largerIndex]-1, 1);
+                moveIndTo(player, centerRow, cardsToPlay[smallerIndex]-1, 1);
                 
                 
-                printf("double match\n");
-                
+                 // error
+                return 3;
                 //double match
 
             }
         }
+        else if(getFromIndex(centerRow, targetIndex-1)->stacked == 1){
+            return -3;
+        }
         else{
-            printf("Not a valid match\n");
+            
             return 0;
         }
         printf("");
@@ -205,5 +234,18 @@ int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIn
     return -1;
 }
 
+void resetPlayDeck(card *playDeck, card *deckHead){
+    for(int i = 0; i < countHand(playDeck); i++){
+        if(getFromIndex(playDeck, i)->stacked == 1){
+            removeFrom(playDeck, getFromIndex(playDeck, i));
+        }
+    }
+    while(countHand(playDeck) < 2){
+        pullFrom(deckHead, playDeck, 1);
+    }
+
+
+
+}
 
 #endif

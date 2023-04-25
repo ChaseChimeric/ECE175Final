@@ -20,3 +20,7 @@ game loop:
         no:
             continue
             
+
+FIXME
+    fix flow from playing on arleady stacked card.
+    prnits not a valid match, but sjould print that you cant play on it because stacked
