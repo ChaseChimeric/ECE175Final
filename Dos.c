@@ -15,13 +15,15 @@
 int main(){
 
 
-    setlocale(LC_ALL, "");
+    //setlocale(LC_ALL, "");
     card *deckHead = NULL, *shuffleHead = NULL, *playDeck = NULL;
     card* players[6];
     int playerScore[6];
-    wchar_t cardGfx[11][41];
+    char cardGfx[12][81];
     loadGfx(cardGfx);
+    fflush(stdout);
     deckHead = (card*)malloc(sizeof(card));
+    printf("%s\n", cardGfx[1]);
         newCardNode(deckHead, NULL, -10, '!', '!'); 
     shuffleHead = (card*)malloc(sizeof(card));
         newCardNode(shuffleHead, NULL, -11, '!', '!'); 
@@ -170,6 +172,10 @@ int main(){
                 break;
             default:
                 break;
+        }
+        //check win round state
+        if(players[currentPlayer]->nextCard == NULL){
+            calcPoints(players[currentPlayer], players[6]);
         }
         amountToPlay = -111;
         cont = 0;

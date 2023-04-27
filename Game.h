@@ -8,11 +8,12 @@
 #include <locale.h>
 #include "cardNodeDos.h"
 
-void showHand(card*, wchar_t[11][41]);
-int ExecuteAction(card*, card*, card*, int, int, int[2], wchar_t[11][41]);
+void showHand(card*, char[11][81]);
+int ExecuteAction(card*, card*, card*, int, int, int[2], char[11][81]);
 void resetPlayDeck(card *playDeck, card *deckHead);
+void roundWin(card *winner, card* players[6]);
 
-void showHand(card* headNode, wchar_t gfx[11][41]){
+void showHand(card* headNode, char gfx[11][81]){
     card* currentNode = headNode->nextCard;
     int iter = 1;
     while (currentNode != NULL)
@@ -42,58 +43,59 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
         }
         switch(currentNode->value){
             case 1:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[1][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[1][i]);
                 }
                 break;
             case 3:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[3][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[3][i]);
                 }
                 break;
             case 4:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[4][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[4][i]);
                 }
                 break;
             case 5:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[5][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[5][i]);
                 }
                 break;
             case 6:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[6][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[6][i]);
                 }
                 break;
             case 7:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[7][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[7][i]);
                 }
                 break;
             case 8:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[8][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[8][i]);
                 }
                 break;
             case 9:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[9][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[9][i]);
                 }
                 break;
             case 10:
-                for(int i = 0; i < 40; i++){
-                    printf("%lc", gfx[10][i]);
+                for(int i = 0; i < 80; i++){
+                    printf("%c", gfx[10][i]);
                 }
                 break;
         }
         if(currentNode->action == '#'){
-            for(int i = 0; i < 40; i++){
-                printf("%lc", gfx[0][i]);
+            for(int i = 0; i < 80; i++){
+                printf("%c", gfx[0][i]);
             }
         }
         if(currentNode->value == 2 && currentNode->stacked != 1){
-            for(int i = 0; i < 40; i++){
+            for(int i = 0; i < 80; i++){
+                /*
                 if(i < 3){
                     printf("\033[31m");}
                 else if((i > 3 && i < 8)){
@@ -103,15 +105,15 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
                 else if((i > 35)){
                     printf("\033[34m");}
                 else{
-                    printf("\033[0m");}
-                printf("%lc", gfx[2][i]);
+                    printf("\033[0m");}*/
+                printf("%c", gfx[2][i]);
 
             }
         }
         else if(currentNode->value == 2 && currentNode->stacked == 1){
             printf("\e[0;35m");
-            for(int i = 0; i < 40; i++){
-                printf("%lc", gfx[2][i]);
+            for(int i = 0; i < 80; i++){
+                printf("%c", gfx[2][i]);
             }
         }
         printf("\033[0m");
@@ -125,7 +127,7 @@ void showHand(card* headNode, wchar_t gfx[11][41]){
 }
 
 
-int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIndex, int amountToPlay, int cardsToPlay[2], wchar_t gfx[11][41]){
+int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIndex, int amountToPlay, int cardsToPlay[2], char gfx[11][81]){
     
     int largerIndex = -1, smallerIndex = -1, swapTmp, input;
     if(amountToPlay == -9){
@@ -238,6 +240,7 @@ void resetPlayDeck(card *playDeck, card *deckHead){
     for(int i = 0; i < countHand(playDeck); i++){
         if(getFromIndex(playDeck, i)->stacked == 1){
             removeFrom(playDeck, getFromIndex(playDeck, i));
+            resetPlayDeck(playDeck, deckHead);
         }
     }
     while(countHand(playDeck) < 2){

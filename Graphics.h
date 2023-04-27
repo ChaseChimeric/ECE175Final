@@ -5,21 +5,25 @@
 #include <wchar.h>
 #include <locale.h>
 
-int loadGfx(wchar_t[11][41]);
+int loadGfx(char[12][81]);
 void G_intro();
 void delay(int, int);
 void ClearScreen();
 
 
-int loadGfx(wchar_t deck[11][41]){
+int loadGfx(char deck[12][81]){
     FILE* inFile = NULL;
     inFile = fopen("DosGraphics.dat", "r");
+
+    char tmp;
     if(inFile == NULL)
         return -1;
+    rewind(inFile);
     for(int i = 0; i < 11; i++){
-        for(int j = 0; j < 40; j++){
-            fscanf(inFile, "%lc", &deck[i][j]);
+        for(int j = 0; j < 80; j++){
+            fscanf(inFile, "%c", &deck[i][j]);
         }
+
     }
 }
 
