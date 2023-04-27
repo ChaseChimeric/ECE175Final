@@ -205,7 +205,7 @@ void shuffleHand(card* headNode, card*shuffleHead){
     node to the second 'shuffle' head node.
     should be used an even number of times to properly shuffle original list
     */
-
+    if(headNode->nextCard != NULL){
     time_t t;
     srand((unsigned) time(&t));
     card *currentNode, *shuffleTemp, *removeCopy;
@@ -213,7 +213,7 @@ void shuffleHand(card* headNode, card*shuffleHead){
 
     newCardNode(shuffleHead, NULL, -69, '#', '#');
     currentNode = headNode->nextCard;
-    while(inHand != 1){
+    while(inHand > 1){
         randSelect = (rand()%(inHand-1))+1; // get random index
         //moveIndTo(shuffleHead, headNode, randSelect-1);
 
@@ -228,6 +228,7 @@ void shuffleHand(card* headNode, card*shuffleHead){
 
         inHand = countHand(headNode); // recount deck
     }
+    
     removeCopy = (card*)malloc(sizeof(card)); // initialize new memory for card
     shuffleTemp = headNode->nextCard; //set shuffleTemp == to old memory
     newCardNode(removeCopy, NULL, shuffleTemp->value, shuffleTemp->action, shuffleTemp->color); //make new copy of data
@@ -235,6 +236,8 @@ void shuffleHand(card* headNode, card*shuffleHead){
     removeCopy->stacked = 0;
     removeFrom(headNode, shuffleTemp); // remove old memory from original head
     free(shuffleTemp);
+    }
+    
 }
 
 void pullFrom(card *from, card *destination, int amount){

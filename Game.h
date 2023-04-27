@@ -11,7 +11,8 @@
 void showHand(card*, char[11][81]);
 int ExecuteAction(card*, card*, card*, int, int, int[2], char[11][81]);
 void resetPlayDeck(card *playDeck, card *deckHead);
-void roundWin(card *winner, card* players[6]);
+int calcPoints(card *winner, card *players[6], int playerAmount);
+int checkWin(int playerScores[6], int playerAmount);
 
 void showHand(card* headNode, char gfx[11][81]){
     card* currentNode = headNode->nextCard;
@@ -249,6 +250,46 @@ void resetPlayDeck(card *playDeck, card *deckHead){
 
 
 
+}
+
+int calcPoints(card *winner, card *players[6], int playerAmount){
+    card *currentCard;
+    int sum = 0;
+    for(int i = 0; i < playerAmount; i++){
+        if(players[i] == winner){
+                continue;
+            }
+        currentCard = players[i]->nextCard;
+        while(currentCard != NULL) {
+            {
+                if((currentCard->value == 1) || (currentCard->value > 2)){
+                    sum += currentCard->value;
+                }
+                else if(currentCard->value == 2){
+                    sum += 20;
+                }
+                else if(currentCard->value == 0){
+                    sum += 40;
+                }
+                
+            }   
+            currentCard = currentCard->nextCard;
+        } 
+
+        
+    }
+
+
+    return sum;
+}
+
+int checkWin(int playerScores[6], int playerAmount){
+    for(int i = 0; i < playerAmount; i++){
+        if(playerScores[i] >= 200){
+            return i+1;
+        }
+    }
+    return 0;
 }
 
 #endif
