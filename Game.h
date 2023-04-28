@@ -13,6 +13,7 @@ int ExecuteAction(card*, card*, card*, int, int, int[2], char[11][81]);
 void resetPlayDeck(card *playDeck, card *deckHead);
 int calcPoints(card *winner, card *players[6], int playerAmount);
 int checkWin(int playerScores[6], int playerAmount);
+void othersDraw(card *currentPlayer, card *players[6], int playerAmount, card*);
 
 void showHand(card* headNode, char gfx[11][81]){
     card* currentNode = headNode->nextCard;
@@ -142,7 +143,7 @@ int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIn
         }
     }
     if((getFromIndex(player, cardsToPlay[0]-1)->color == 'W') || (amountToPlay == 2 && getFromIndex(player, cardsToPlay[1]-1)->color == 'W')){
-        printf("wildcard played\n");
+        printf("wild Dos card played\n");
     }
     if(amountToPlay == 0){
         moveIndTo(player, centerRow, cardsToPlay[0]-1, 0);
@@ -178,11 +179,14 @@ int ExecuteAction(card* player, card* centerRow, card* shuffleHead, int targetIn
     
     }
     else if(amountToPlay == 2){
+        
         int cardSum = getFromIndex(player,cardsToPlay[0]-1)->value + getFromIndex(player,cardsToPlay[1]-1)->value;
         // if one card is bigger than the target card, return -1
         cardSum = (getFromIndex(player,cardsToPlay[0]-1)->value == 0)? 0 : cardSum;
         cardSum = (getFromIndex(player,cardsToPlay[1]-1)->value == 0)? 0 : cardSum;
-        
+        if(getFromIndex(centerRow, targetIndex-1)->value == 0){
+            cardSum = 0;   
+        }
 
         
         if((cardSum == getFromIndex(centerRow, targetIndex-1)->value || cardSum == 0 )&& getFromIndex(centerRow, targetIndex-1)->stacked != 1){
@@ -292,4 +296,15 @@ int checkWin(int playerScores[6], int playerAmount){
     return 0;
 }
 
+
+void othersDraw(card *currentPlayer, card *players[6], int playerAmount, card *deck){
+    card *currentCard;
+    for(int i = 0; i < playerAmount; i++){
+        if(players[i] == currentPlayer){
+                continue;
+            }
+        pullFrom(deck, players[i], 1);
+    } 
+
+}
 #endif
