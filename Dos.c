@@ -40,7 +40,7 @@ int main(){
 
     // Shuffle deck
     ClearScreen();
-    //G_intro();
+    G_intro();
     ClearScreen();
 
 
@@ -77,7 +77,7 @@ int main(){
     while(!playerWon)
     {   
         for(int i = 0; i < playerAmount; i++){
-            pullFrom(deckHead, players[i], 2);
+            pullFrom(deckHead, players[i], 7);
         }
         pullFrom(deckHead, playDeck, 2);
         gameloop = 1;
