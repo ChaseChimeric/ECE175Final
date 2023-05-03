@@ -34,7 +34,7 @@ int main(){
         newCardNode(shuffleHead, NULL, -11, '!', '!'); 
     playDeck = (card*)malloc(sizeof(card));
         newCardNode(playDeck, NULL, -420, '!', '!');
-    printf("Fullscreen is recommended\nThis game has a deck already set up, or you can load your own.\nDo you want to load a custom deck? (y/n): ");
+    printf("\t\033[33mFullscreen is recommended\n\tScrolling may be required\033[0m\n\nThis game has a deck already set up, or you can load your own.\nDo you want to load a custom deck? (y/n): ");
     while(tmpInput != 'y' && tmpInput != 'Y' && tmpInput != 'n' && tmpInput != 'N'){
         scanf("%c", &tmpInput);
         if(tmpInput == 'y' || tmpInput == 'Y'){
@@ -245,6 +245,7 @@ int main(){
                 shuffleHand(shuffleHead, deckHead);
 
         }
+		currentPlayer = 0;
         playerWon = checkWin(playerScore, playerAmount);
     for(int i = 0; i < playerAmount; i++)
         shuffleHand(players[i], shuffleHead);
@@ -253,7 +254,10 @@ int main(){
     shuffleHand(shuffleHead, deckHead);
 
 }
-printf("Player %d has won\nThanks for playing.\n", playerWon+1);
+ClearScreen();
+printf("Player %d has won\nThanks for playing.\n", playerWon);
+    fflush(stdin);
+    scanf("%*c");
     fflush(stdout);
     return 0;
 }

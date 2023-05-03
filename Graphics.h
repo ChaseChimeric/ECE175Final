@@ -1,5 +1,6 @@
 #ifndef _Graphics
 #define _Graphics
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,7 +25,13 @@ int loadGfx(char deck[12][41]){
     rewind(inFile);
     for(int i = 0; i < 11; i++){
         for(int j = 0; j < 40; j++){
-            fscanf(inFile, "%c", &deck[i][j]);
+            fscanf(inFile, "%c", &tmp);
+            if (tmp == '\r') {
+                j--;
+                continue;
+            }
+            deck[i][j] = tmp;
+            
         }
 
     }
@@ -98,13 +105,13 @@ void G_intro(){
 }
 void delay(int seconds, int ms){
     //Custom delay for < 1s delays
-    struct timespec remaining, request = { seconds, ms*1000000 };
+    struct timespec remaining, request = { seconds, ms*1000000};
     nanosleep(&request, &remaining);
 }
 
 void ClearScreen(){
     //Clears screen with newlines
-    for(int i = 0; i < 50; i++){
+    for(int i = 0; i < 75; i++){
         printf("\n");
     }
         fflush(stdout);

@@ -98,17 +98,17 @@ void showHand(card* headNode, char gfx[11][41]){
         }
         if(currentNode->value == 2 && currentNode->stacked != 1){
             for(int i = 0; i < 40; i++){
-                /*
-                if(i < 3){
+                
+                if(i < 2){
                     printf("\033[31m");}
-                else if((i > 3 && i < 8)){
+                else if((i > 4 && i < 8)){
                     printf("\033[32m");}
-                else if((i > 31 && i < 35)){
+                else if((i > 30 && i < 34)){
                     printf("\033[33m");}
-                else if((i > 35)){
+                else if((i > 36)){
                     printf("\033[34m");}
                 else{
-                    printf("\033[0m");}*/
+                    printf("\033[0m");}
                 printf("%c", gfx[2][i]);
 
             }
