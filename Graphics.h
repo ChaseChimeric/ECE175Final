@@ -1,17 +1,20 @@
+#ifndef _Graphics
+#define _Graphics
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
-#include <wchar.h>
-#include <locale.h>
 
-int loadGfx(char[12][81]);
+
+int loadGfx(char[12][41]);
 void G_intro();
 void delay(int, int);
 void ClearScreen();
 
 
-int loadGfx(char deck[12][81]){
+int loadGfx(char deck[12][41]){
+    /*
+    Loads graphics into array
+    */
     FILE* inFile = NULL;
     inFile = fopen("DosGraphics.dat", "r");
 
@@ -20,14 +23,18 @@ int loadGfx(char deck[12][81]){
         return -1;
     rewind(inFile);
     for(int i = 0; i < 11; i++){
-        for(int j = 0; j < 80; j++){
+        for(int j = 0; j < 40; j++){
             fscanf(inFile, "%c", &deck[i][j]);
         }
 
     }
+    return 0;
 }
 
 void G_intro(){
+    /*
+    Prints scrolling intro screen
+    */
     FILE *logoFile = fopen("DosLogo.dat", "r");
     char tmp;
     int count = 0;
@@ -90,14 +97,17 @@ void G_intro(){
     
 }
 void delay(int seconds, int ms){
+    //Custom delay for < 1s delays
     struct timespec remaining, request = { seconds, ms*1000000 };
     nanosleep(&request, &remaining);
 }
 
 void ClearScreen(){
+    //Clears screen with newlines
     for(int i = 0; i < 50; i++){
         printf("\n");
     }
         fflush(stdout);
 
 }
+#endif

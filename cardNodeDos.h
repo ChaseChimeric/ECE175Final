@@ -3,7 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <wchar.h>
+
+
+/*
+    All (or most) of the functions dealing mainly with linked lists
+    and the card structs
+*/
 
 typedef struct _cardNode {
     // Data
@@ -83,30 +88,75 @@ void initDeck(card *head, char filepath[]){
     /*
     opens file at filepath, reads cards in dynamically
     */
+   int def = 0;
+    if(strcmp("cardDeckDos.dat", filepath) == 0){
+        def = 1;
+    }
+        
     FILE* inFile = NULL;
     inFile = fopen(filepath, "r");
-    char line[25], tmpDat3;
-    char tmpDat1;
-    int tmpDat2;
-
-    fgets(line, 25, inFile);
-    // Reading each card in
-    while(!feof(inFile)){ 
-        card *tmp = (card*)malloc(sizeof(card));
-        fscanf(inFile, "%c%*c", &tmpDat1);
-        tmp->action = tmpDat1;
-        fscanf(inFile, "%c%*c", &tmpDat3);
-        tmp->color = tmpDat3;
-        fscanf(inFile, "%d%*c", &tmpDat2);
-        tmp->value = tmpDat2;
-        insertAfter(head, tmp);
-        tmp->stacked = 0;
+    if(inFile == NULL){
+        printf("Error reading filepath, defaulting to cardDeckDos.dat\n");
+        inFile = fopen("cardDeckDos.dat", "r");
+        def = 1;
     }
-    // Extra copy of last card is added because of feof() behavior, this fixed that
-    //card *tempdel = head->nextCard;
-    //removeFrom(head, tempdel);
-    //free(tempdel);
-    //fclose(inFile);
+    if(def == 0){
+        char tmpDat3[40];
+        char tmpDat1[40];
+        int tmpDat2;
+        while(!feof(inFile)){ 
+            card *tmp = (card*)malloc(sizeof(card));
+            fscanf(inFile, "%s%*c", &tmpDat1);
+            if(strcmp("red", tmpDat1) == 0){
+                tmp->color = 'R';
+            }
+            else if(strcmp("blue", tmpDat1) == 0){
+                tmp->color = 'B';
+            }
+            else if(strcmp("yellow", tmpDat1) == 0){
+                tmp->color = 'Y';
+            }
+            else if(strcmp("green", tmpDat1) == 0){
+                tmp->color = 'G';
+            }
+            fscanf(inFile, "%d%*c", &tmpDat2);
+            tmp->value = tmpDat2;
+            fscanf(inFile, "%s%*c", &tmpDat3);
+            if(strcmp("none", tmpDat3) == 0){
+                tmp->action = 'X';
+            }
+            else if(strcmp("AnyNumber", tmpDat3) == 0){
+                tmp->action = '#';
+            }
+            if(tmp->value == 2){
+                tmp->action = '2';
+            }
+            insertAfter(head, tmp);
+            tmp->stacked = 0;
+        }
+
+    }
+
+
+    else if(def == 1){
+        char line[25], tmpDat3;
+        char tmpDat1;
+        int tmpDat2;
+
+        fgets(line, 25, inFile);
+        // Reading each card in
+        while(!feof(inFile)){ 
+            card *tmp = (card*)malloc(sizeof(card));
+            fscanf(inFile, "%c%*c", &tmpDat1);
+            tmp->action = tmpDat1;
+            fscanf(inFile, "%c%*c", &tmpDat3);
+            tmp->color = tmpDat3;
+            fscanf(inFile, "%d%*c", &tmpDat2);
+            tmp->value = tmpDat2;
+            insertAfter(head, tmp);
+            tmp->stacked = 0;
+        }
+    }
 }
 
 void listHandText(card* headNode){
@@ -215,8 +265,6 @@ void shuffleHand(card* headNode, card*shuffleHead){
     currentNode = headNode->nextCard;
     while(inHand > 1){
         randSelect = (rand()%(inHand-1))+1; // get random index
-        //moveIndTo(shuffleHead, headNode, randSelect-1);
-
         removeCopy = (card*)malloc(sizeof(card)); // initialize new memory for card
         shuffleTemp = (card*)(getFromIndex(headNode, randSelect)); //set shuffleTemp == to old memory
         newCardNode(removeCopy, NULL, shuffleTemp->value, shuffleTemp->action, shuffleTemp->color); //make new copy of data
@@ -224,8 +272,6 @@ void shuffleHand(card* headNode, card*shuffleHead){
         removeCopy->stacked = 0;
         removeFrom(headNode, shuffleTemp); // remove old memory from original head
         free(shuffleTemp); // free old memory
-        
-
         inHand = countHand(headNode); // recount deck
     }
     
